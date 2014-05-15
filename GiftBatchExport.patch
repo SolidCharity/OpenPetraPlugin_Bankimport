@@ -1,0 +1,59 @@
+diff --git a/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs b/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
+index cef2105..82874f8 100644
+--- a/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
++++ b/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
+@@ -140,6 +140,17 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+             }
+         }
+ 
++        /// <summary>
++        /// set the number format: American or European
++        /// </summary>
++        public string NumberFormat
++        {
++            set
++            {
++                cmbNumberFormat.SelectedIndex = (value.ToLower() == "American".ToLower() ? 0 : 1);
++            }
++        }
++
+         const String sSpace = "[SPACE]";
+         private String ConvertDelimiter(String Delimiter, bool displayform)
+         {
+@@ -221,11 +232,16 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+             TUserDefaults.SaveChangedUserDefaults();
+         }
+ 
++        private void ExportBatches(object sender, EventArgs e)
++        {
++            ExportBatches();
++        }
++
+         /// <summary>
+         /// this supports the batch export files from Petra 2.x.
+         /// Each line starts with a type specifier, B for batch, J for journal, T for transaction
+         /// </summary>
+-        public void ExportBatches(object sender, EventArgs e)
++        public void ExportBatches(bool AWithInteractionOnSuccess = true)
+         {
+             StreamWriter sw1 = null;
+ 
+@@ -358,10 +374,14 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+                 sw1.Close();
+ 
+                 SaveUserDefaults();
+-                MessageBox.Show(Catalog.GetString("Gift Batches Exported successfully."),
+-                    Catalog.GetString("Gift Batch Export"),
+-                    MessageBoxButtons.OK,
+-                    MessageBoxIcon.Information);
++
++                if (AWithInteractionOnSuccess)
++                {
++                    MessageBox.Show(Catalog.GetString("Gift Batches Exported successfully."),
++                        Catalog.GetString("Gift Batch Export"),
++                        MessageBoxButtons.OK,
++                        MessageBoxIcon.Information);
++                }
+             }
+             catch (Exception ex)
+             {

@@ -20,7 +20,6 @@ obj
 *.pdb
 *.pidb
 *.orig
-*.patch
 *.de-DE.yaml
 *.da-DK.yaml
 *.es-ES.yaml
