@@ -1,0 +1,5 @@
+# 
+# add the names of the interfaces that are not calculated automatically, ie. all namespaces defined in dlls that are needed, but would be missing.
+#
+InterfacesUsingNamespaces:
+    Plugin: [Ict.Petra.Shared.MFinance.Account.Data]
