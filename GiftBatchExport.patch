@@ -1,69 +1,8 @@
-From 2cc227f0265fa5498075e34b9ced2fb620c2a0fe Mon Sep 17 00:00:00 2001
-From: Timotheus Pokorra <timotheus.pokorra@om.org>
-Date: Fri, 29 Nov 2013 14:36:00 +0100
-Subject: [PATCH] todo backport: fix problem with gift batch export, in
- european format (decimal comma). see also
- https://tracker.openpetra.org/view.php?id=2541
-
----
- .../Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs | 9 +++++++--
- csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs      | 4 +++-
- 2 files changed, 10 insertions(+), 3 deletions(-)
-
 diff --git a/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs b/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
-index c5e93b1..96f54d4 100644
+index cef2105..0b5ab59 100644
 --- a/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
 +++ b/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
-@@ -148,6 +148,11 @@ public string NumberFormat
-             set
-             {
-                 cmbNumberFormat.SelectedIndex = (value.ToLower() == "American".ToLower() ? 0 : 1);
-+
-+                if ((cmbDelimiter.GetSelectedString() == ",") && (value.ToLower() == "European".ToLower()))
-+                {
-+                    cmbDelimiter.SetSelectedString(";");
-+                }
-             }
-         }
- 
-@@ -300,7 +305,7 @@ public void ExportBatches(bool AWithInteractionOnSuccess = true)
- 
-                 Hashtable requestParams = new Hashtable();
-                 requestParams.Add("ALedgerNumber", FLedgerNumber);
--                requestParams.Add("Delimiter", ConvertDelimiter(cmbDelimiter.GetSelectedString(), false));
-+                requestParams.Add("Delimiter", delimiter);
-                 requestParams.Add("DateFormatString", cmbDateFormat.GetSelectedString());
-                 requestParams.Add("Summary", rbtSummary.Checked);
-                 requestParams.Add("IncludeUnposted", chkIncludeUnposted.Checked);
-@@ -309,7 +314,7 @@ public void ExportBatches(bool AWithInteractionOnSuccess = true)
-                 requestParams.Add("RecipientNumber", Convert.ToInt64(txtDetailRecipientKey.Text));
-                 requestParams.Add("FieldNumber", Convert.ToInt64(txtDetailFieldKey.Text));
-                 requestParams.Add("DateForSummary", dtpDateSummary.Date);
--                requestParams.Add("NumberFormat", ConvertNumberFormat(cmbNumberFormat));
-+                requestParams.Add("NumberFormat", numberFormat);
-                 requestParams.Add("ExtraColumns", chkExtraColumns.Checked);
- 
-                 if (rbtBatchNumberSelection.Checked)
-diff --git a/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs b/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs
-index 18874ad..b47a231 100644
---- a/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs
-+++ b/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs
-@@ -534,7 +534,9 @@ void WriteCurrency(decimal currencyField, bool bLineEnd = false)
-             else
-             {
-                 FStringWriter.Write(quote);
--                FStringWriter.Write(StringHelper.FormatUsingCurrencyCode(currencyField, FCurrencyCode));
-+                // see https://tracker.openpetra.org/view.php?id=2541
-+                //FStringWriter.Write(StringHelper.FormatUsingCurrencyCode(currencyField, FCurrencyCode, FCultureInfo));
-+                FStringWriter.Write(String.Format(FCultureInfo, "{0:g}", currencyField));
-                 FStringWriter.Write(quote);
-             }
-
-diff --git a/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs b/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
-index cef2105..82874f8 100644
---- a/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
-+++ b/csharp/ICT/Petra/Client/MFinance/Gui/Gift/GiftBatchExport.ManualCode.cs
-@@ -140,6 +140,17 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+@@ -140,6 +140,22 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
              }
          }
  
@@ -75,13 +14,18 @@ index cef2105..82874f8 100644
 +            set
 +            {
 +                cmbNumberFormat.SelectedIndex = (value.ToLower() == "American".ToLower() ? 0 : 1);
++
++                if ((cmbDelimiter.GetSelectedString() == ",") && (value.ToLower() == "European".ToLower()))
++                {
++                    cmbDelimiter.SetSelectedString(";");
++                }
 +            }
 +        }
 +
          const String sSpace = "[SPACE]";
          private String ConvertDelimiter(String Delimiter, bool displayform)
          {
-@@ -221,11 +232,16 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+@@ -221,11 +237,16 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
              TUserDefaults.SaveChangedUserDefaults();
          }
  
@@ -99,7 +43,25 @@ index cef2105..82874f8 100644
          {
              StreamWriter sw1 = null;
  
-@@ -358,10 +374,14 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+@@ -289,7 +310,7 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+ 
+                 Hashtable requestParams = new Hashtable();
+                 requestParams.Add("ALedgerNumber", FLedgerNumber);
+-                requestParams.Add("Delimiter", ConvertDelimiter(cmbDelimiter.GetSelectedString(), false));
++                requestParams.Add("Delimiter", delimiter);
+                 requestParams.Add("DateFormatString", cmbDateFormat.GetSelectedString());
+                 requestParams.Add("Summary", rbtSummary.Checked);
+                 requestParams.Add("IncludeUnposted", chkIncludeUnposted.Checked);
+@@ -298,7 +319,7 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+                 requestParams.Add("RecipientNumber", Convert.ToInt64(txtDetailRecipientKey.Text));
+                 requestParams.Add("FieldNumber", Convert.ToInt64(txtDetailFieldKey.Text));
+                 requestParams.Add("DateForSummary", dtpDateSummary.Date);
+-                requestParams.Add("NumberFormat", ConvertNumberFormat(cmbNumberFormat));
++                requestParams.Add("NumberFormat", numberFormat);
+                 requestParams.Add("ExtraColumns", chkExtraColumns.Checked);
+ 
+                 if (rbtBatchNumberSelection.Checked)
+@@ -358,10 +379,14 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
                  sw1.Close();
  
                  SaveUserDefaults();
@@ -118,3 +80,28 @@ index cef2105..82874f8 100644
              }
              catch (Exception ex)
              {
+@@ -427,4 +452,4 @@ namespace Ict.Petra.Client.MFinance.Gui.Gift
+             // TODO
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs b/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs
+index 1ab0727..36173e5 100644
+--- a/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs
++++ b/csharp/ICT/Petra/Server/lib/MFinance/Gift/Gift.Exporting.cs
+@@ -564,7 +564,9 @@ namespace Ict.Petra.Server.MFinance.Gift
+             else
+             {
+                 FStringWriter.Write(quote);
+-                FStringWriter.Write(StringHelper.FormatUsingCurrencyCode(currencyField, FCurrencyCode));
++                // see https://tracker.openpetra.org/view.php?id=2541
++                //FStringWriter.Write(StringHelper.FormatUsingCurrencyCode(currencyField, FCurrencyCode, FCultureInfo));
++                FStringWriter.Write(String.Format(FCultureInfo, "{0:g}", currencyField));
+                 FStringWriter.Write(quote);
+             }
+ 
+diff --git a/initPlugins.sh b/initPlugins.sh
+old mode 100644
+new mode 100755
