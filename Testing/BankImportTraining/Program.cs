@@ -46,9 +46,11 @@ using Ict.Petra.Server.MFinance.Common;
 using Ict.Petra.Shared.MFinance;
 using Ict.Petra.Plugins.BankimportMT940.Client;
 using Ict.Petra.Plugins.Bankimport.Client;
+using Ict.Petra.Plugins.Bankimport.WebConnectors;
 using Ict.Petra.Shared.MFinance.Gift.Data;
+using Ict.Petra.Plugins.Bankimport.Data;
 
-namespace Ict.Petra.Plugins.Testing.Bankimport.Training
+namespace Ict.Petra.Plugins.Bankimport.Training
 {
     /// <summary>
     /// do the bankimport training. job too long for http remoting at the moment

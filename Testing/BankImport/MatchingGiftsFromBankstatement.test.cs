@@ -41,13 +41,16 @@ using Ict.Petra.Server.MFinance.Gift;
 using Ict.Petra.Shared.MFinance.Gift.Data;
 using Ict.Petra.Shared.MFinance.Account.Data;
 using Ict.Petra.Server.MFinance.Account.Data.Access;
+using Ict.Petra.Server.MFinance.Gift.WebConnectors;
+using Ict.Petra.Plugins.Bankimport.WebConnectors;
 using Ict.Petra.Plugins.Bankimport.Client;
 using Ict.Petra.Plugins.BankimportCSV.Client;
+using Ict.Petra.Plugins.Bankimport.Data;
 using Ict.Common.Data;
 using Ict.Petra.Shared.MFinance;
 using Ict.Testing.NUnitTools;
 
-namespace Ict.Petra.Plugins.Testing.Bankimport
+namespace Ict.Petra.Plugins.Bankimport.Testing
 {
     /// This will test the business logic directly on the server
     [TestFixture]
