@@ -74,6 +74,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
             out Int32 AFirstStatementKey)
         {
             string MyClientID = DomainManager.GClientID.ToString();
+
             AFirstStatementKey = -1;
 
             TProgressTracker.InitProgressTracker(MyClientID,
@@ -595,7 +596,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
             }
 
             AMainDS.ThrowAwayAfterSubmitChanges = true;
-            
+
             try
             {
                 BankImportTDSAccess.SubmitChanges(AMainDS);
