@@ -800,7 +800,6 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 else
                 {
                     MessageBox.Show(
-                        VerificationResult.BuildVerificationResultString(),
                         Catalog.GetString("Problem: No gift batch has been created"));
                 }
             }
