@@ -97,7 +97,8 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             }
             else
             {
-                this.Close();
+                // we cannot close here, because the Show method would fail. TODO: add return false?
+                // this.Close();
             }
         }
 
