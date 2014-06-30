@@ -48,7 +48,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
         /// <summary>
         /// constant for the namespace of the bankimport plugin
         /// </summary>
-        public static string PluginNamespace = "Ict.Petra.Plugins.BankImport";
+        public static string PluginNamespace = "Ict.Petra.Plugins.Bankimport";
 
         /// <summary>
         /// use this ledger
@@ -71,13 +71,15 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
                 StringCollection list = new StringCollection();
 
-                string[] files = Directory.GetFiles(TAppSettingsManager.ApplicationDirectory, PluginNamespace + "*.dll");
+                string[] files = Directory.GetFiles(TAppSettingsManager.ApplicationDirectory, PluginNamespace + "*.Client.dll");
 
                 foreach (string file in files)
                 {
-                    if (file != PluginNamespace + ".dll")
+                    string FormatName = Path.GetFileName(file).Replace(PluginNamespace, "").Replace(".Client.dll", "");
+
+                    if (FormatName.Length > 0)
                     {
-                        list.Add(Path.GetFileNameWithoutExtension(file).Substring(PluginNamespace.Length + 1));
+                        list.Add(FormatName);
                     }
                 }
 

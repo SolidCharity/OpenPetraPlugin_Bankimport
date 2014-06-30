@@ -147,8 +147,8 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 // look for available plugin for importing a bank statement.
                 // the plugin will upload the data into the tables a_ep_statement and a_ep_transaction on the server/database
 
-                string BankStatementImportPlugin = TFrmImportNewBankStatement.PluginNamespace + "." + TUserDefaults.GetStringDefault(
-                    TUserDefaults.FINANCE_BANKIMPORT_PLUGIN);
+                string FormatName = TUserDefaults.GetStringDefault(TUserDefaults.FINANCE_BANKIMPORT_PLUGIN);
+                string BankStatementImportPlugin = TFrmImportNewBankStatement.PluginNamespace + FormatName + ".Client";
 
                 // namespace of the class TBankStatementImport, eg. Plugin.BankImportFromCSV
                 // the dll has to be in the normal application directory
@@ -165,6 +165,13 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 // dynamic loading of dll
                 System.Reflection.Assembly assemblyToUse = System.Reflection.Assembly.LoadFrom(NameOfDll);
                 System.Type CustomClass = assemblyToUse.GetType(NameOfClass);
+
+                if (CustomClass == null)
+                {
+                    MessageBox.Show(Catalog.GetString("Invalid plugin " + NameOfDll + Environment.NewLine +
+                            "Cannot find class " + NameOfClass));
+                    return;
+                }
 
                 IImportBankStatement ImportBankStatement = (IImportBankStatement)Activator.CreateInstance(CustomClass);
 
