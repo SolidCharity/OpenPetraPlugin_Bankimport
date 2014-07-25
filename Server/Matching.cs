@@ -887,9 +887,13 @@ namespace Ict.Petra.Plugins.Bankimport.Server
                         Replace(".", "").
                         Replace(" ", "");
 
-            if (matchtext.Contains("EREF+ZV") && matchtext.Contains("PURP+RINP"))
+            if (matchtext.Contains("EREF+") && matchtext.IndexOf("PURP+RINP") > matchtext.IndexOf("EREF+"))
             {
-                matchtext = matchtext.Substring(0, matchtext.IndexOf("EREF+ZV")) + matchtext.Substring(matchtext.IndexOf("PURP+RINP"));
+                matchtext = matchtext.Substring(0, matchtext.IndexOf("EREF+")) + matchtext.Substring(matchtext.IndexOf("PURP+RINP"));
+            }
+            if (matchtext.Contains("EREF+") && matchtext.IndexOf("SVWZ+") > matchtext.IndexOf("EREF+"))
+            {
+                matchtext = matchtext.Substring(0, matchtext.IndexOf("EREF+")) + matchtext.Substring(matchtext.IndexOf("SVWZ+"));
             }
 
             if (matchtext.Contains("IBAN:") && matchtext.Contains("BIC:"))
@@ -909,11 +913,8 @@ namespace Ict.Petra.Plugins.Bankimport.Server
 
             matchtext = matchtext.Replace("PURP+RINPRATENZAHLUNG", "");
 
-            if (matchtext.Contains("ABWA+"))
-            {
-                // abweichender Zahlungsauftraggeber
-                matchtext = matchtext.Substring(0, matchtext.IndexOf("ABWA+"));
-            }
+            // abweichender Zahlungsauftraggeber
+            matchtext = matchtext.Replace("ABWA+", "");
 
             matchtext = matchtext.Replace("SVWZ+", "");
 
