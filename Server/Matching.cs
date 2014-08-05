@@ -887,11 +887,12 @@ namespace Ict.Petra.Plugins.Bankimport.Server
                         Replace(".", "").
                         Replace(" ", "");
 
-            if (matchtext.Contains("EREF+") && matchtext.IndexOf("PURP+RINP") > matchtext.IndexOf("EREF+"))
+            if (matchtext.Contains("EREF+") && (matchtext.IndexOf("PURP+RINP") > matchtext.IndexOf("EREF+")))
             {
                 matchtext = matchtext.Substring(0, matchtext.IndexOf("EREF+")) + matchtext.Substring(matchtext.IndexOf("PURP+RINP"));
             }
-            if (matchtext.Contains("EREF+") && matchtext.IndexOf("SVWZ+") > matchtext.IndexOf("EREF+"))
+
+            if (matchtext.Contains("EREF+") && (matchtext.IndexOf("SVWZ+") > matchtext.IndexOf("EREF+")))
             {
                 matchtext = matchtext.Substring(0, matchtext.IndexOf("EREF+")) + matchtext.Substring(matchtext.IndexOf("SVWZ+"));
             }
@@ -918,7 +919,7 @@ namespace Ict.Petra.Plugins.Bankimport.Server
 
             matchtext = matchtext.Replace("SVWZ+", "");
 
-            matchtext = ABankAccount.ToUpper() + AccountNumber + matchtext + tr.TransactionAmount.ToString("0.##");
+            matchtext = ABankAccount.ToUpper() + AccountNumber + matchtext + tr.TransactionAmount.ToString("0.##").Replace(".", "");
 
             string oldMatchText = String.Empty;
 
