@@ -84,11 +84,7 @@ namespace Ict.Petra.Plugins.Bankimport.Server
 
                 int SelectedGiftBatch = -1;
 
-                if (GiftBatchNumbers.Count == 1)
-                {
-                    SelectedGiftBatch = GiftBatchNumbers[0];
-                }
-                else if (GiftBatchNumbers.Count > 1)
+                if (GiftBatchNumbers.Count > 0)
                 {
                     TLogging.LogAtLevel(1, "Found gift batches: " + GiftBatchNumbers.Count.ToString());
 
