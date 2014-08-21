@@ -777,6 +777,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                         gift.LastDetailNumber++;
 
                         detail.GiftTransactionAmount = match.GiftTransactionAmount;
+                        detail.GiftAmount = match.GiftTransactionAmount;
                         HashTotal += match.GiftTransactionAmount;
                         detail.MotivationGroupCode = match.MotivationGroupCode;
                         detail.MotivationDetailCode = match.MotivationDetailCode;
