@@ -1196,7 +1196,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 else
                 {
                     // extra space for unmatched gifts
-                    rowToPrint = rowToPrint.Replace("#RECIPIENTDESCRIPTIONUNMATCHED", "<br/><br/><br/>");
+                    rowToPrint = rowToPrint.Replace("#RECIPIENTDESCRIPTIONUNMATCHED", "<br/><br/>");
                     rowToPrint = rowToPrint.Replace("#RECIPIENTDESCRIPTION", string.Empty);
                 }
 
