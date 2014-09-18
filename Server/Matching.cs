@@ -66,6 +66,7 @@ namespace Ict.Petra.Plugins.Bankimport.Server
 
                 if (TProgressTracker.GetCurrentState(DomainManager.GClientID.ToString()).CancelJob == true)
                 {
+                    TProgressTracker.FinishJob(MyClientID);
                     return;
                 }
 
