@@ -2,7 +2,7 @@
 // DO NOT REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 //
 // @Authors:
-//       timop
+//       timop,jstelter
 //
 // Copyright 2004-2014 by OM International
 //
@@ -227,7 +227,12 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             {
                 if (dialog.ShowDialog() == DialogResult.Cancel)
                 {
-                    return;
+                    MessageBox.Show("Das Trainieren wurde abgebrochen");
+                }
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    MessageBox.Show("Das Trainieren war erfolgreich");
                 }
             }
         }
