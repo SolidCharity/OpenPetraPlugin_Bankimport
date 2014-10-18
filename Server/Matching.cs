@@ -910,6 +910,7 @@ namespace Ict.Petra.Plugins.Bankimport.Server
             }
 
             matchtext = matchtext.Replace("PURP+RINPRATENZAHLUNG", "");
+            matchtext = matchtext.Replace("PURP+RINPDauerauftragRate".ToUpper(), "");
 
             // abweichender Zahlungsauftraggeber
             matchtext = matchtext.Replace("ABWA+", "");
