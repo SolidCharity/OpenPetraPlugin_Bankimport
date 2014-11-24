@@ -102,8 +102,9 @@ namespace Ict.Petra.Plugins.Bankimport.Testing
             parameters.Add("NewLine", Environment.NewLine);
 
             TVerificationResultCollection VerificationResult;
+            GiftBatchTDSAGiftDetailTable NeedRecipientLedgerNumber;
 
-            importer.ImportGiftBatches(parameters, FileContent, out VerificationResult);
+            importer.ImportGiftBatches(parameters, FileContent, out NeedRecipientLedgerNumber, out VerificationResult);
 
             int BatchNumber = importer.GetLastGiftBatchNumber();
 
