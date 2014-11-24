@@ -186,7 +186,7 @@ namespace Ict.Petra.Plugins.Bankimport.Testing
                 "cannot create gift batch from bank statement:");
 
             // check if the gift batch is correct
-            GiftBatchTDS GiftDS = TGiftTransactionWebConnector.LoadGiftBatchAndRelatedData(FLedgerNumber, GiftBatchNumber);
+            GiftBatchTDS GiftDS = TGiftTransactionWebConnector.LoadAGiftBatchAndRelatedData(FLedgerNumber, GiftBatchNumber);
 
             // since we are not able to match the split gift, only 2 gifts should be matched.
             // TODO: allow 2 gifts to be merged in OpenPetra, even when they come separate on the bank statement.
