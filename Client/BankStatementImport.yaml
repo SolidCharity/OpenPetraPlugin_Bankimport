@@ -11,12 +11,6 @@ RootNode:
     Actions:
         actSave:
             Label: Save Matches
-        actAddGiftDetail:
-            Label: &Add
-            ActionClick: AddGiftDetail
-        actRemoveGiftDetail:
-            Label: &Delete
-            ActionClick: RemoveGiftDetail
         actCreateGiftBatch:
             ActionClick: CreateGiftBatch
         actCreateGLBatch:
@@ -62,24 +56,28 @@ RootNode:
         # pnlStatementInfo:
             # Controls: [txtStartBalance, txtEndBalance, txtSumDebit, txtSumCredit, txtNumberMatchedTransactions]
         sptTransactionDetails:
-            Panel1: grdAllTransactions
+            Panel1: pnlTransactions
             Panel2: pnlDetails
             SplitterDistance: 40
             SplitterOrientation: horizontal
             Dock: Fill
+        pnlTransactions:
+            Dock: Fill
+            Controls: [grdAllTransactions, pnlTransactionButton]
+        pnlTransactionButton:
+            Dock: Right
+            Controls: [btnEditMatch]
+        btnEditMatch:
+            ActionClick: EditMatchClicked
         grdAllTransactions:
             Dock: Fill
             ActionFocusRow: AllTransactionsFocusedRowChanged
+            ActionDoubleClick: EditMatchClicked
+            ActionEnterKeyPressed: EditMatchClicked
         pnlDetails:
             Dock: Fill
             Visible: false
-            Controls: [rgrTransactionCategory, pnlHostCategorySpecificEdit]
-        rgrTransactionCategory:
-            OptionalValues: [Unmatched, Gift, GL, Ignored]
-            ControlsOrientation: vertical
-            NoLabel: true
-            OnChange: NewTransactionCategory
-            Dock: Left
+            Controls: [pnlHostCategorySpecificEdit]
         pnlHostCategorySpecificEdit:
             Controls: [pnlGiftEdit, pnlGLEdit]
             Dock: Fill
@@ -90,10 +88,7 @@ RootNode:
         txtDonorKey: {Label=Donor, Type=PartnerKey, Dock=Top}
         pnlDetailGrid:
             Dock: Fill
-            Controls: [grdGiftDetails, pnlDetailButtons]
-        pnlDetailButtons:
-            Dock: Right
-            Controls: [btnAddGiftDetail, btnRemoveGiftDetail]
+            Controls: [grdGiftDetails]
         grdGiftDetails:
             Dock: Fill
             ActionFocusRow: GiftDetailsFocusedRowChanged
@@ -106,15 +101,13 @@ RootNode:
                 Row3: [txtRecipientKey]
                 Row6: [txtField,chkDetailChargeFlag]
                 Row7: [cmbMinistry]
-        btnAddGiftDetail:
-        btnRemoveGiftDetail:
         txtAmount: {Format=Currency, ColSpan=2}
-        cmbMotivationGroup: {Label=Motivation Group, List=UserDefinedList, OnChange=FilterMotivationDetail, Width=200}
-        cmbMotivationDetail: {Label=Motivation Detail, List=UserDefinedList, OnChange=MotivationDetailChanged, Width=200}
+        cmbMotivationGroup: {Label=Motivation Group, List=UserDefinedList, Width=200}
+        cmbMotivationDetail: {Label=Motivation Detail, List=UserDefinedList, Width=200}
         txtRecipientKey: {Label=Recipient, Type=PartnerKey, ColSpan=2}
         txtField: {Label=Field, Type=PartnerKey, ReadOnly=true, SuppressChangeDetection=true}
         chkDetailChargeFlag: {Label=Admin Grants?}
-        cmbMinistry: {Label=Key Ministry, ColSpan=2, Width=250, List=UserDefinedList, OnChange=KeyMinistryChanged}
+        cmbMinistry: {Label=Key Ministry, ColSpan=2, Width=250, List=UserDefinedList}
         txtGiftAccount: {Label=Account, ReadOnly=true, SuppressChangeDetection=true}
         txtGiftCostCentre: {Label=Cost Centre, ReadOnly=true, SuppressChangeDetection=true}
         pnlGLEdit:

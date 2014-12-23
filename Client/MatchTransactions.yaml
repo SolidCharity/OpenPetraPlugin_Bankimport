@@ -1,0 +1,79 @@
+RootNode:
+    BaseYaml: ../../../Client/CommonForms/PetraFormDialog.yaml
+    FormTitle: Match Transactions
+    Namespace: Ict.Petra.Plugins.Bankimport.Client
+    DatasetType: Ict.Petra.Plugins.Bankimport.Data.BankImportTDS
+    FormType: dialog
+    Template: window
+    WindowWidth: 1000
+    WindowHeight: 723
+    Actions:
+        actAddGiftDetail:
+            Label: &Add
+            ActionClick: AddGiftDetail
+        actRemoveGiftDetail:
+            Label: &Delete
+            ActionClick: RemoveGiftDetail
+    Controls:
+        pnlDialogContent:
+            Dock: Fill
+            Controls: 
+                Row0: [txtTransactionDescription]
+                Row1: [rgrTransactionCategory, pnlHostCategorySpecificEdit]
+        txtTransactionDescription:
+            Dock: Top
+            Width: 500
+            Enabled: False
+        rgrTransactionCategory:
+            OptionalValues: [Unmatched, Gift, GL, Ignored]
+            ControlsOrientation: vertical
+            NoLabel: true
+            OnChange: NewTransactionCategory
+            Dock: Left
+        pnlHostCategorySpecificEdit:
+            Controls: [pnlGiftEdit, pnlGLEdit]
+            Dock: Fill
+        pnlGiftEdit:
+            Dock: Fill
+            Visible: false
+            Controls: [txtDonorKey, pnlDetailGrid, pnlEditGiftDetail]
+        txtDonorKey: {Label=Donor, Type=PartnerKey, Dock=Top}
+        pnlDetailGrid:
+            Dock: Fill
+            Controls: [grdGiftDetails, pnlDetailButtons]
+        pnlDetailButtons:
+            Dock: Right
+            Controls: [btnAddGiftDetail, btnRemoveGiftDetail]
+        grdGiftDetails:
+            Dock: Fill
+            ActionFocusRow: GiftDetailsFocusedRowChanged
+        pnlEditGiftDetail: 
+            Dock:Bottom
+            Controls: 
+                Row0: [txtAmount]
+                Row1: [cmbMotivationGroup, txtGiftAccount]
+                Row2: [cmbMotivationDetail, txtGiftCostCentre]
+                Row3: [txtRecipientKey]
+                Row6: [txtField,chkDetailChargeFlag]
+                Row7: [cmbMinistry]
+        btnAddGiftDetail:
+        btnRemoveGiftDetail:
+        txtAmount: {Format=Currency, ColSpan=2}
+        cmbMotivationGroup: {Label=Motivation Group, List=UserDefinedList, OnChange=FilterMotivationDetail, Width=200}
+        cmbMotivationDetail: {Label=Motivation Detail, List=UserDefinedList, OnChange=MotivationDetailChanged, Width=200}
+        txtRecipientKey: {Label=Recipient, Type=PartnerKey, ColSpan=2}
+        txtField: {Label=Field, Type=PartnerKey, ReadOnly=true, SuppressChangeDetection=true}
+        chkDetailChargeFlag: {Label=Admin Grants?}
+        cmbMinistry: {Label=Key Ministry, ColSpan=2, Width=250, List=UserDefinedList, OnChange=KeyMinistryChanged}
+        txtGiftAccount: {Label=Account, ReadOnly=true, SuppressChangeDetection=true}
+        txtGiftCostCentre: {Label=Cost Centre, ReadOnly=true, SuppressChangeDetection=true}
+        pnlGLEdit:
+            Dock: Fill
+            Visible: false
+            Controls: [txtGLNarrative, txtGLReference, cmbGLAccount, cmbGLCostCentre]
+        cmbGLAccount: {Label=Account, List=UserDefinedList}
+        cmbGLCostCentre: {Label=Cost Centre, List=UserDefinedList}
+        txtGLNarrative: {Label=Narrative}
+        txtGLReference: {Label=Reference}
+    Menu:
+    Toolbar:
