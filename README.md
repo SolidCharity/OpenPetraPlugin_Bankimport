@@ -25,8 +25,6 @@ Please copy this directory to your OpenPetra working directory, to csharp\ICT\Pe
 
     git submodule add https://github.com/SolidCharity/OpenPetraPlugin_Bankimport csharp/ICT/Petra/Plugins/Bankimport
 
-also apply the patch GiftBatchExport.patch!
-    
 and then run
 
     nant generateSolution

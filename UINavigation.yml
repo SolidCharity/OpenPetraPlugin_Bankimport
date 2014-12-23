@@ -1,0 +1,7 @@
+OpenPetra:
+    MainMenu:
+        Finance:
+            Finance:
+                GiftProcessing:
+                    GiftEntry:
+                        ImportGiftsFromBankStatement: {Description: "Import Bank Statements", Namespace=Ict.Petra.Plugins.Bankimport.Client, ActionOpenScreen=TFrmBankStatementImport, Label="Bank Import", PermissionsRequired=FINANCE-1}
