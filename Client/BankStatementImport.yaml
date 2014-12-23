@@ -65,7 +65,7 @@ RootNode:
             Dock: Fill
             Controls: [grdAllTransactions, pnlTransactionButton]
         pnlTransactionButton:
-            Dock: Right
+            Dock: Bottom
             Controls: [btnEditMatch]
         btnEditMatch:
             ActionClick: EditMatchClicked
