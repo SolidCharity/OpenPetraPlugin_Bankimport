@@ -151,7 +151,8 @@ namespace Ict.Petra.Plugins.Bankimport.Testing
             requestParams.Add("NewBatchSelected", false);
             requestParams.Add("GlEffectiveDate", new DateTime(DateTime.Now.Year, 09, 30));
 
-            Assert.AreEqual(true, TAdjustmentWebConnector.GiftRevertAdjust(requestParams, out VerificationResult), "reversing the gift batch");
+            int AdjustmentBatchNumber;
+            Assert.AreEqual(true, TAdjustmentWebConnector.GiftRevertAdjust(requestParams, out AdjustmentBatchNumber, out VerificationResult), "reversing the gift batch");
 
             CommonNUnitFunctions.EnsureNullOrOnlyNonCriticalVerificationResults(VerificationResult,
                 "Gift Batch was not reverted:");
