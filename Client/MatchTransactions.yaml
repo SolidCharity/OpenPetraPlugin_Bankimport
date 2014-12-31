@@ -5,8 +5,8 @@ RootNode:
     DatasetType: Ict.Petra.Plugins.Bankimport.Data.BankImportTDS
     FormType: dialog
     Template: window
-    WindowWidth: 1000
-    WindowHeight: 723
+    WindowWidth: 900
+    WindowHeight: 400
     Actions:
         actAddGiftDetail:
             Label: &Add
