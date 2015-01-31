@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2014 by OM International
+// Copyright 2004-2015 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -152,10 +152,8 @@ namespace Ict.Petra.Plugins.Bankimport.Testing
             requestParams.Add("GlEffectiveDate", new DateTime(DateTime.Now.Year, 09, 30));
 
             int AdjustmentBatchNumber;
-            Assert.AreEqual(true, TAdjustmentWebConnector.GiftRevertAdjust(requestParams, out AdjustmentBatchNumber, out VerificationResult), "reversing the gift batch");
-
-            CommonNUnitFunctions.EnsureNullOrOnlyNonCriticalVerificationResults(VerificationResult,
-                "Gift Batch was not reverted:");
+            GiftBatchTDS GiftReverseDS = TGiftTransactionWebConnector.LoadGiftTransactionsForBatch(FLedgerNumber, BatchNumber); 
+            Assert.AreEqual(true, TAdjustmentWebConnector.GiftRevertAdjust(requestParams, out AdjustmentBatchNumber, GiftReverseDS), "reversing the gift batch");
 
             // duplicate the bank import file, for the next month
             FileContent = FileContent.Replace("30.09." + DateTime.Now.Year.ToString("0000"),
