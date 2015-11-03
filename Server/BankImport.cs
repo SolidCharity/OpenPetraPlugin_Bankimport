@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2014 by OM International
+// Copyright 2004-2015 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -802,22 +802,19 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                     TResultSeverity.Resv_Critical));
                         }
 
-                        if (detail.CostCentreCode.Length == 0)
+                        // try to retrieve the current costcentre for this recipient
+                        if (detail.RecipientKey != 0)
                         {
-                            // try to retrieve the current costcentre for this recipient
-                            if (detail.RecipientKey != 0)
-                            {
-                                detail.RecipientLedgerNumber = TGiftTransactionWebConnector.GetRecipientFundNumber(detail.RecipientKey);
+                            detail.RecipientLedgerNumber = TGiftTransactionWebConnector.GetRecipientFundNumber(detail.RecipientKey);
 
-                                detail.CostCentreCode = TGiftTransactionWebConnector.IdentifyPartnerCostCentre(detail.LedgerNumber,
-                                    detail.RecipientLedgerNumber);
-                            }
-                            else
+                            detail.CostCentreCode = TGiftTransactionWebConnector.IdentifyPartnerCostCentre(detail.LedgerNumber,
+                                detail.RecipientLedgerNumber);
+                        }
+                        else
+                        {
+                            if (motivation != null)
                             {
-                                if (motivation != null)
-                                {
-                                    detail.CostCentreCode = motivation.CostCentreCode;
-                                }
+                                detail.CostCentreCode = motivation.CostCentreCode;
                             }
                         }
 
