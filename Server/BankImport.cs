@@ -434,6 +434,15 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                 r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
+                            // check if the costcentre is still active
+                            ACostCentreRow costcentre = (ACostCentreRow)ResultDataset.ACostCentre.Rows.Find(new object[] { ALedgerNumber, r.CostCentreCode });
+
+                            if ((costcentre == null) || !costcentre.CostCentreActiveFlag)
+                            {
+                                TLogging.LogAtLevel(1, "costcentre " + r.CostCentreCode + " is not active anymore; donor: " + r.DonorKey.ToString());
+                                r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+                            }
+
                             if (r.RecentMatch < row.DateEffective)
                             {
                                 r.RecentMatch = row.DateEffective;
