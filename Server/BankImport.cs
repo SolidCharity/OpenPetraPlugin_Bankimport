@@ -679,6 +679,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                         Catalog.GetString("Creating Gift Batch"),
                         String.Format(Catalog.GetString("There are no transactions for statement #{0}."), AStatementKey),
                         TResultSeverity.Resv_Info));
+                TProgressTracker.FinishJob(MyClientID);
                 return -1;
             }
 
@@ -702,6 +703,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                 transactionRow.Description);
                         AVerificationResult.Add(new TVerificationResult(Catalog.GetString("Creating Gift Batch"), msg, TResultSeverity.Resv_Critical));
                         DBAccess.GDBAccessObj.RollbackTransaction();
+                        TProgressTracker.FinishJob(MyClientID);
                         return -1;
                     }
                 }
@@ -849,6 +851,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
 
             if (AVerificationResult.HasCriticalErrors)
             {
+                TProgressTracker.FinishJob(MyClientID);
                 return -1;
             }
 
