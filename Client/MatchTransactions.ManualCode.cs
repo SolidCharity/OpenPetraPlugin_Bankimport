@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2014 by OM International
+// Copyright 2004-2015 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -430,6 +430,8 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             {
                 txtAmount.NumberValueDecimal = CurrentlySelectedTransaction.TransactionAmount;
             }
+
+            pnlEditGiftDetail.Enabled = true;
         }
 
         private void GetGiftDetailValuesFromScreen()
@@ -546,7 +548,8 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 FMainDS.AEpMatch.Rows.Add(newRow);
 
                 // select the new gift detail
-                grdGiftDetails.SelectRowInGrid(grdGiftDetails.Rows.Count - 1);
+                grdGiftDetails.SelectRowInGrid(grdGiftDetails.Rows.Count-1);
+                pnlEditGiftDetail.Enabled = true;
             }
         }
 
@@ -561,19 +564,17 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             }
 
             // we should never allow to delete all details, otherwise we have nothing to copy from
-            // also cannot delete the first detail, since there is the foreign key from a_ep_transaction on epmatchkey?
-            if (CurrentlySelectedTransaction.IsEpMatchKeyNull() || (CurrentlySelectedTransaction.EpMatchKey == CurrentlySelectedMatch.EpMatchKey))
+            if (FMatchView.Count == 1)
             {
-                // Problem: ist momentan möglich, wenn noch kein Match da ist, CurrentlySelectedTransaction.IsEpMatchKeyNull ist null
-                MessageBox.Show(Catalog.GetString("Cannot delete the first detail"));
+                MessageBox.Show(Catalog.GetString("At least one detail must remain"));
             }
             else
             {
                 CurrentlySelectedMatch.Delete();
                 CurrentlySelectedMatch = null;
+                grdGiftDetails.SelectRowInGrid(-1);
 
-                // select the last gift detail
-                grdGiftDetails.SelectRowInGrid(grdGiftDetails.Rows.Count - 1);
+                pnlEditGiftDetail.Enabled = false;
             }
         }
 
