@@ -223,7 +223,10 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
             long FieldNumber = Convert.ToInt64(txtField.Text);
 
-            txtGiftCostCentre.Text = TRemote.MFinance.Gift.WebConnectors.IdentifyPartnerCostCentre(FLedgerNumber, FieldNumber);
+            if (FieldNumber > 0)
+            {
+                txtGiftCostCentre.Text = TRemote.MFinance.Gift.WebConnectors.IdentifyPartnerCostCentre(FLedgerNumber, FieldNumber);
+            }
         }
 
         private void MotivationDetailChanged(System.Object sender, EventArgs e)
