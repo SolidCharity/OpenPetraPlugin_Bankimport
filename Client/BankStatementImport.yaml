@@ -71,6 +71,10 @@ RootNode:
             ActionClick: EditMatchClicked
         grdAllTransactions:
             Dock: Fill
+            TableName: AEpTransaction
+            Columns: [NumberOnPaperStatement, AccountName, Description, DateEffective, TransactionAmount]
+            CustomColumns:
+                NumberOnPaperStatement: {Label=Nr}
             ActionFocusRow: AllTransactionsFocusedRowChanged
             ActionDoubleClick: EditMatchClicked
             ActionEnterKeyPressed: EditMatchClicked
@@ -91,6 +95,13 @@ RootNode:
             Controls: [grdGiftDetails]
         grdGiftDetails:
             Dock: Fill
+            TableName: AEpMatch
+            Columns: [MotivationDetailCode, CostCentreCode, CostCentreName, GiftTransactionAmount]
+            CustomColumns:
+                MotivationDetailCode: {Label=Motivation}
+                CostCentreCode: {Label=Cost Centre}
+                CostCentreName: {Label=Cost Centre Name}
+                GiftTransactionAmount: {Label=Amount}
             ActionFocusRow: GiftDetailsFocusedRowChanged
         pnlEditGiftDetail: 
             Dock:Bottom

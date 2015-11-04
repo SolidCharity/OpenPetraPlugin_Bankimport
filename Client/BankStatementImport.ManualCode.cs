@@ -151,13 +151,6 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
             CurrentStatement = (AEpStatementRow)FMainDS.AEpStatement[0];
 
-            grdAllTransactions.Columns.Clear();
-            grdAllTransactions.AddTextColumn(Catalog.GetString("Nr"), FMainDS.AEpTransaction.ColumnNumberOnPaperStatement);
-            grdAllTransactions.AddTextColumn(Catalog.GetString("Account Name"), FMainDS.AEpTransaction.ColumnAccountName);
-            grdAllTransactions.AddTextColumn(Catalog.GetString("description"), FMainDS.AEpTransaction.ColumnDescription);
-            grdAllTransactions.AddDateColumn(Catalog.GetString("Date Effective"), FMainDS.AEpTransaction.ColumnDateEffective);
-            grdAllTransactions.AddCurrencyColumn(Catalog.GetString("Transaction Amount"), FMainDS.AEpTransaction.ColumnTransactionAmount);
-
             FTransactionView = FMainDS.AEpTransaction.DefaultView;
             FTransactionView.AllowNew = false;
             FTransactionView.Sort = AEpTransactionTable.GetOrderDBName() + " ASC";
@@ -168,11 +161,6 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             TFinanceControls.InitialiseCostCentreList(ref cmbGLCostCentre, FLedgerNumber, true, false, true, true);
             TFinanceControls.InitialiseAccountList(ref cmbGLAccount, FLedgerNumber, true, false, true, false);
 
-            grdGiftDetails.Columns.Clear();
-            grdGiftDetails.AddTextColumn(Catalog.GetString("Motivation"), FMainDS.AEpMatch.ColumnMotivationDetailCode);
-            grdGiftDetails.AddTextColumn(Catalog.GetString("Cost Centre"), FMainDS.AEpMatch.ColumnCostCentreCode);
-            grdGiftDetails.AddTextColumn(Catalog.GetString("Cost Centre Name"), FMainDS.AEpMatch.ColumnCostCentreName);
-            grdGiftDetails.AddCurrencyColumn(Catalog.GetString("Amount"), FMainDS.AEpMatch.ColumnGiftTransactionAmount);
             FMatchView = FMainDS.AEpMatch.DefaultView;
             FMatchView.AllowNew = false;
             grdGiftDetails.DataSource = new DevAge.ComponentModel.BoundDataView(FMatchView);
@@ -192,6 +180,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
             TransactionFilterChanged(null, null);
             grdAllTransactions.SelectRowInGrid(1);
+            grdAllTransactions.AutoResizeGrid();
         }
 
         private AEpStatementRow CurrentStatement = null;
@@ -233,6 +222,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 grdGiftDetails.SelectRowInGrid(1);
                 // grdGiftDetails.SelectRowInGrid does not seem to update the gift details, so we call that manually
                 GiftDetailsFocusedRowChanged(null, null);
+                grdGiftDetails.AutoResizeGrid();
                 grdAllTransactions.Focus();
             }
             else if (match.Action == MFinanceConstants.BANK_STMT_STATUS_MATCHED_GL)
