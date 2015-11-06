@@ -182,6 +182,10 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
             DateTime endDateLastMonth = startDateThisMonth.AddDays(-1);
             DateTime startDateLastMonth = new DateTime(endDateLastMonth.Year, endDateLastMonth.Month, 1);
 
+            // for debugging the training:
+            //startDateLastMonth = new DateTime(2015,10,5);
+            //startDateThisMonth = startDateLastMonth.AddDays(1);
+
             // get all bank accounts
             TCacheable CachePopulator = new TCacheable();
             Type typeofTable;
@@ -438,7 +442,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                             ACostCentreRow costcentre = (ACostCentreRow)ResultDataset.ACostCentre.Rows.Find(new object[] { ALedgerNumber,
                                                                                                                            r.CostCentreCode });
 
-                            if ((costcentre == null) || !costcentre.CostCentreActiveFlag)
+                            if ((costcentre != null) && !costcentre.CostCentreActiveFlag)
                             {
                                 TLogging.LogAtLevel(1, "costcentre " + r.CostCentreCode + " is not active anymore; donor: " + r.DonorKey.ToString());
                                 r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;

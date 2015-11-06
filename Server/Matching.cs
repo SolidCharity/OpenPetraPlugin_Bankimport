@@ -952,16 +952,14 @@ namespace Ict.Petra.Plugins.Bankimport.Server
             BankImportTDS AMatchDS,
             BankImportTDSAGiftDetailRow AGiftDetailRow,
             string AMatchText,
-            DataView MatchesByText,
+            SortedList <string, AEpMatchRow>AMatchesByText,
             SortedList <string, AEpMatchRow>AMatchesToAddLater)
         {
             AEpMatchRow newMatch = null;
 
-            int ExistingMatch = MatchesByText.Find(AMatchText);
-
-            if (ExistingMatch != -1)
+            if (AMatchesByText.ContainsKey(AMatchText))
             {
-                newMatch = (AEpMatchRow)MatchesByText[ExistingMatch].Row;
+                newMatch = AMatchesByText[AMatchText];
             }
             else
             {
@@ -1025,10 +1023,12 @@ namespace Ict.Petra.Plugins.Bankimport.Server
 
             SortedList <string, AEpMatchRow>MatchesToAddLater = new SortedList <string, AEpMatchRow>();
 
-            DataView MatchesByText = new DataView(
-                AMatchDS.AEpMatch, string.Empty,
-                AEpMatchTable.GetMatchTextDBName(),
-                DataViewRowState.CurrentRows);
+            // for speed reasons, use a sortedlist instead of a dataview
+            SortedList<string, AEpMatchRow> MatchesByText = new SortedList<string, AEpMatchRow>();
+            foreach (AEpMatchRow r in AMatchDS.AEpMatch.Rows)
+            {
+                MatchesByText[r.MatchText] = r;
+            }
 
             foreach (BankImportTDSAEpTransactionRow tr in AMatchDS.AEpTransaction.Rows)
             {
@@ -1061,9 +1061,6 @@ namespace Ict.Petra.Plugins.Bankimport.Server
                         MatchesToAddLater);
                 }
             }
-
-            MatchesByText.Sort = string.Empty;
-            MatchesByText.RowFilter = string.Empty;
 
             // for speed reasons, add the new rows at the end
             foreach (AEpMatchRow m in MatchesToAddLater.Values)
