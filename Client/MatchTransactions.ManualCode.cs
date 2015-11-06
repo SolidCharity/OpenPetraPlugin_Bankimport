@@ -551,7 +551,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 FMainDS.AEpMatch.Rows.Add(newRow);
 
                 // select the new gift detail
-                grdGiftDetails.SelectRowInGrid(grdGiftDetails.Rows.Count-1);
+                grdGiftDetails.SelectRowInGrid(grdGiftDetails.Rows.Count - 1);
                 pnlEditGiftDetail.Enabled = true;
             }
         }

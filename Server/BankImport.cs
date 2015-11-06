@@ -435,7 +435,8 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                             }
 
                             // check if the costcentre is still active
-                            ACostCentreRow costcentre = (ACostCentreRow)ResultDataset.ACostCentre.Rows.Find(new object[] { ALedgerNumber, r.CostCentreCode });
+                            ACostCentreRow costcentre = (ACostCentreRow)ResultDataset.ACostCentre.Rows.Find(new object[] { ALedgerNumber,
+                                                                                                                           r.CostCentreCode });
 
                             if ((costcentre == null) || !costcentre.CostCentreActiveFlag)
                             {
@@ -611,8 +612,9 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 BankImportTDSAccess.SubmitChanges(AMainDS);
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                TLogging.Log("Bankimport, CommitMatches: " + e.ToString());
                 return false;
             }
         }
