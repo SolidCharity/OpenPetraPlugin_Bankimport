@@ -952,21 +952,23 @@ namespace Ict.Petra.Plugins.Bankimport.Server
             BankImportTDS AMatchDS,
             BankImportTDSAGiftDetailRow AGiftDetailRow,
             string AMatchText,
+            int ADetailNr,
             SortedList <string, AEpMatchRow>AMatchesByText,
             SortedList <string, AEpMatchRow>AMatchesToAddLater)
         {
             AEpMatchRow newMatch = null;
 
-            if (AMatchesByText.ContainsKey(AMatchText))
+            if (AMatchesByText.ContainsKey(AMatchText + ":::" + ADetailNr.ToString()))
             {
-                newMatch = AMatchesByText[AMatchText];
+                newMatch = AMatchesByText[AMatchText + ":::" + ADetailNr.ToString()];
             }
             else
             {
                 // we might have added such a match for the current statement
                 int MatchDetail = 0;
 
-                while (AMatchesToAddLater.ContainsKey(AMatchText + ":::" + MatchDetail.ToString()))
+                while (AMatchesToAddLater.ContainsKey(AMatchText + ":::" + MatchDetail.ToString())
+                       || AMatchesByText.ContainsKey(AMatchText + ":::" + MatchDetail.ToString()))
                 {
                     MatchDetail++;
                 }
@@ -1024,10 +1026,11 @@ namespace Ict.Petra.Plugins.Bankimport.Server
             SortedList <string, AEpMatchRow>MatchesToAddLater = new SortedList <string, AEpMatchRow>();
 
             // for speed reasons, use a sortedlist instead of a dataview
-            SortedList<string, AEpMatchRow> MatchesByText = new SortedList<string, AEpMatchRow>();
+            SortedList <string, AEpMatchRow>MatchesByText = new SortedList <string, AEpMatchRow>();
+
             foreach (AEpMatchRow r in AMatchDS.AEpMatch.Rows)
             {
-                MatchesByText[r.MatchText] = r;
+                MatchesByText[r.MatchText + ":::" + r.Detail.ToString()] = r;
             }
 
             foreach (BankImportTDSAEpTransactionRow tr in AMatchDS.AEpTransaction.Rows)
@@ -1057,6 +1060,7 @@ namespace Ict.Petra.Plugins.Bankimport.Server
                         AMatchDS,
                         (BankImportTDSAGiftDetailRow)FilteredGiftDetails[0].Row,
                         MatchText,
+                        Convert.ToInt32(strDetailNumber) - 1,
                         MatchesByText,
                         MatchesToAddLater);
                 }
