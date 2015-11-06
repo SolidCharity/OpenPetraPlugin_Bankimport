@@ -307,6 +307,18 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
             return false;
         }
 
+        private struct MatchDate
+        {
+            public MatchDate(AEpMatchRow AR, DateTime AD)
+            {
+                r = AR;
+                d = AD;
+            }
+
+            public AEpMatchRow r;
+            public DateTime d;
+        }
+
         /// <summary>
         /// returns the transactions of the bank statement, and the matches if they exist;
         /// tries to find matches too
@@ -379,6 +391,8 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 TempDataset.AEpMatch.DefaultView.Sort = AEpMatchTable.GetMatchTextDBName();
 
                 SortedList <string, AEpMatchRow>MatchesToAddLater = new SortedList <string, AEpMatchRow>();
+                List <MatchDate>NewDates = new List <MatchDate>();
+                List <AEpMatchRow>SetUnmatched = new List <AEpMatchRow>();
 
                 int count = 0;
 
@@ -419,14 +433,14 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                             AEpMatchRow r = (AEpMatchRow)rv.Row;
 
                             sum += r.GiftTransactionAmount;
+                            string action = r.Action;
 
                             // check if the recipient key is still valid. could be that they have married, and merged into another family record
                             if ((r.RecipientKey != 0)
                                 && (MergedPartners.DefaultView.FindRows(r.RecipientKey).Length > 0))
                             {
                                 TLogging.LogAtLevel(1, "partner has been merged: " + r.RecipientKey.ToString());
-                                r.RecipientKey = 0;
-                                r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+                                action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
                             // check if the donor key is still valid. could be that they have married, and merged into another family record
@@ -434,8 +448,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                 && (MergedPartners.DefaultView.FindRows(r.DonorKey).Length > 0))
                             {
                                 TLogging.LogAtLevel(1, "partner has been merged: " + r.DonorKey.ToString());
-                                r.DonorKey = 0;
-                                r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+                                action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
                             // check if the costcentre is still active
@@ -445,16 +458,22 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                             if ((costcentre != null) && !costcentre.CostCentreActiveFlag)
                             {
                                 TLogging.LogAtLevel(1, "costcentre " + r.CostCentreCode + " is not active anymore; donor: " + r.DonorKey.ToString());
-                                r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+                                action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
                             if (r.RecentMatch < row.DateEffective)
                             {
-                                r.RecentMatch = row.DateEffective;
+                                // do not modify RecentMatch here for speed reasons
+                                // r.RecentMatch = row.DateEffective;
+                                NewDates.Add(new MatchDate(r, row.DateEffective));
                             }
 
-                            // do not modify tempRow.MatchAction, because that will not be stored in the database anyway, just costs time
-                            row.MatchAction = r.Action;
+                            if (action == MFinanceConstants.BANK_STMT_STATUS_UNMATCHED)
+                            {
+                                SetUnmatched.Add(r);
+                            }
+
+                            row.MatchAction = action;
 
                             if (r.IsDonorKeyNull() || (r.DonorKey <= 0))
                             {
@@ -464,13 +483,19 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
 
                         if (sum != row.TransactionAmount)
                         {
-                            TLogging.Log("we should drop this match since the total is wrong: " + row.Description);
+                            TLogging.Log(
+                                "we should drop this match since the total is wrong: " + row.Description + " " + sum.ToString() + " " +
+                                row.TransactionAmount.ToString());
                             row.MatchAction = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
 
                             foreach (DataRowView rv in matches)
                             {
                                 AEpMatchRow r = (AEpMatchRow)rv.Row;
-                                r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+
+                                if (!SetUnmatched.Contains(r))
+                                {
+                                    SetUnmatched.Add(r);
+                                }
                             }
                         }
                     }
@@ -522,6 +547,18 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 foreach (AEpMatchRow m in MatchesToAddLater.Values)
                 {
                     TempDataset.AEpMatch.Rows.Add(m);
+                }
+
+                foreach (MatchDate date in NewDates)
+                {
+                    date.r.RecentMatch = date.d;
+                }
+
+                foreach (AEpMatchRow r in SetUnmatched)
+                {
+                    r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+                    r.DonorKey = 0;
+                    r.RecipientKey = 0;
                 }
 
                 TProgressTracker.SetCurrentState(MyClientID,
