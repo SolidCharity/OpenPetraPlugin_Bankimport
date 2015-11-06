@@ -3,7 +3,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2014 by OM International
+// Copyright 2004-2015 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -947,33 +947,44 @@ namespace Ict.Petra.Plugins.Bankimport.Server
             return matchtext;
         }
 
-        /// add new matches
-        private static Int32 CreateNewMatches(
+        /// add new matches, and modify existing matches
+        private static Int32 UpdateMatches(
             BankImportTDS AMatchDS,
             BankImportTDSAGiftDetailRow AGiftDetailRow,
             string AMatchText,
+            DataView MatchesByText,
             SortedList <string, AEpMatchRow>AMatchesToAddLater)
         {
             AEpMatchRow newMatch = null;
 
-            // we might have added such a match for the current statement
-            int MatchDetail = 0;
+            int ExistingMatch = MatchesByText.Find(AMatchText);
 
-            while (AMatchesToAddLater.ContainsKey(AMatchText + ":::" + MatchDetail.ToString()))
+            if (ExistingMatch != -1)
             {
-                MatchDetail++;
+                newMatch = (AEpMatchRow)MatchesByText[ExistingMatch].Row;
+            }
+            else
+            {
+                // we might have added such a match for the current statement
+                int MatchDetail = 0;
+
+                while (AMatchesToAddLater.ContainsKey(AMatchText + ":::" + MatchDetail.ToString()))
+                {
+                    MatchDetail++;
+                }
+
+                string key = AMatchText + ":::" + MatchDetail.ToString();
+
+                newMatch = AMatchDS.AEpMatch.NewRowTyped();
+
+                // matchkey will be set properly on save, by sequence
+                newMatch.EpMatchKey = -1 * (AMatchesToAddLater.Count + 1);
+                newMatch.MatchText = AMatchText;
+                AMatchesToAddLater.Add(key, newMatch);
+
+                newMatch.Detail = MatchDetail;
             }
 
-            string key = AMatchText + ":::" + MatchDetail.ToString();
-
-            newMatch = AMatchDS.AEpMatch.NewRowTyped();
-
-            // matchkey will be set properly on save, by sequence
-            newMatch.EpMatchKey = -1 * (AMatchesToAddLater.Count + 1);
-            newMatch.MatchText = AMatchText;
-            AMatchesToAddLater.Add(key, newMatch);
-
-            newMatch.Detail = MatchDetail;
             newMatch.Action = MFinanceConstants.BANK_STMT_STATUS_MATCHED_GIFT;
 
             newMatch.RecipientKey = AGiftDetailRow.RecipientKey;
@@ -1004,6 +1015,8 @@ namespace Ict.Petra.Plugins.Bankimport.Server
         /// </summary>
         private static void StoreCurrentMatches(BankImportTDS AMatchDS, string ABankAccountCode)
         {
+            TLogging.LogAtLevel(1, "StoreCurrentMatches...");
+
             DataView GiftDetailView = new DataView(
                 AMatchDS.AGiftDetail, string.Empty,
                 BankImportTDSAGiftDetailTable.GetGiftTransactionNumberDBName() + "," +
@@ -1011,15 +1024,16 @@ namespace Ict.Petra.Plugins.Bankimport.Server
                 DataViewRowState.CurrentRows);
 
             SortedList <string, AEpMatchRow>MatchesToAddLater = new SortedList <string, AEpMatchRow>();
-            List <string>MatchesToDelete = new List <string>();
+
+            DataView MatchesByText = new DataView(
+                AMatchDS.AEpMatch, string.Empty,
+                AEpMatchTable.GetMatchTextDBName(),
+                DataViewRowState.CurrentRows);
 
             foreach (BankImportTDSAEpTransactionRow tr in AMatchDS.AEpTransaction.Rows)
             {
                 // create a match text which uniquely identifies this transaction
                 string MatchText = CalculateMatchText(ABankAccountCode, tr);
-
-                // delete existing matches
-                MatchesToDelete.Add(MatchText);
 
                 if (tr.MatchAction != MFinanceConstants.BANK_STMT_STATUS_MATCHED)
                 {
@@ -1038,28 +1052,13 @@ namespace Ict.Petra.Plugins.Bankimport.Server
                                 Convert.ToInt32(strDetailNumber)
                             });
 
-                    // add new matches
-                    // do not assign tr.EpMatchKey, because we cannot delete the old matches then
-                    CreateNewMatches(
+                    // add new matches, and modify existing matches
+                    UpdateMatches(
                         AMatchDS,
                         (BankImportTDSAGiftDetailRow)FilteredGiftDetails[0].Row,
                         MatchText,
+                        MatchesByText,
                         MatchesToAddLater);
-                }
-            }
-
-            DataView MatchesByText = new DataView(
-                AMatchDS.AEpMatch, string.Empty,
-                AEpMatchTable.GetMatchTextDBName(),
-                DataViewRowState.CurrentRows);
-
-            foreach (string MatchToDelete in MatchesToDelete)
-            {
-                DataRowView[] MatchesToDeleteRv = MatchesByText.FindRows(MatchToDelete);
-
-                foreach (DataRowView rv in MatchesToDeleteRv)
-                {
-                    rv.Row.Delete();
                 }
             }
 
@@ -1078,17 +1077,11 @@ namespace Ict.Petra.Plugins.Bankimport.Server
 
             AMatchDS.ThrowAwayAfterSubmitChanges = true;
 
-            if (TLogging.DebugLevel > 0)
-            {
-                TLogging.Log("before submitchanges");
-            }
+            TLogging.LogAtLevel(1, "before submitchanges");
 
             BankImportTDSAccess.SubmitChanges(AMatchDS);
 
-            if (TLogging.DebugLevel > 0)
-            {
-                TLogging.Log("after submitchanges");
-            }
+            TLogging.LogAtLevel(1, "after submitchanges");
         }
     }
 }
