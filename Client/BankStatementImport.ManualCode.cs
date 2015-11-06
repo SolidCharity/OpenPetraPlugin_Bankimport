@@ -122,6 +122,8 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             // merge the cost centres and the motivation details from the cacheable tables
             FMainDS.ACostCentre.Merge(TDataCache.TMFinance.GetCacheableFinanceTable(TCacheableFinanceTablesEnum.CostCentreList, FLedgerNumber));
             FMainDS.AMotivationDetail.Merge(TDataCache.TMFinance.GetCacheableFinanceTable(TCacheableFinanceTablesEnum.MotivationList, FLedgerNumber));
+            FMainDS.ACostCentre.AcceptChanges();
+            FMainDS.AMotivationDetail.AcceptChanges();
 
             // load the transactions of the selected statement, and the matches
             Thread t = new Thread(() => GetBankStatementTransactionsAndMatches(AStatementKey));
