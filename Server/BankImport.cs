@@ -290,17 +290,22 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
             }
         }
 
-        private static bool FindDonorByAccountNumber(AEpMatchRow AMatchRow,
+        private static bool FindDonorByAccountNumber(
             DataView APartnerByBankAccount,
             string ABankSortCode,
-            string AAccountNumber)
+            string AAccountNumber,
+            out string ADonorShortName,
+            out Int64 ADonorKey)
         {
+            ADonorShortName = String.Empty;
+            ADonorKey = -1;
+
             DataRowView[] rows = APartnerByBankAccount.FindRows(new object[] { ABankSortCode, AAccountNumber });
 
             if (rows.Length == 1)
             {
-                AMatchRow.DonorShortName = rows[0].Row["ShortName"].ToString();
-                AMatchRow.DonorKey = Convert.ToInt64(rows[0].Row["PartnerKey"]);
+                ADonorShortName = rows[0].Row["ShortName"].ToString();
+                ADonorKey = Convert.ToInt64(rows[0].Row["PartnerKey"]);
                 return true;
             }
 
@@ -317,6 +322,19 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
 
             public AEpMatchRow r;
             public DateTime d;
+        }
+
+        private struct MatchDonor
+        {
+            public MatchDonor(AEpMatchRow AR, string ABankCode, string AAccountCode)
+            {
+                r = AR;
+                a = AAccountCode;
+                b = ABankCode; 
+            }
+
+            public AEpMatchRow r;
+            public string a, b;
         }
 
         /// <summary>
@@ -393,6 +411,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 SortedList <string, AEpMatchRow>MatchesToAddLater = new SortedList <string, AEpMatchRow>();
                 List <MatchDate>NewDates = new List <MatchDate>();
                 List <AEpMatchRow>SetUnmatched = new List <AEpMatchRow>();
+                List <MatchDonor>FindDonorKey = new List<MatchDonor>();
 
                 int count = 0;
 
@@ -477,7 +496,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
 
                             if (r.IsDonorKeyNull() || (r.DonorKey <= 0))
                             {
-                                FindDonorByAccountNumber(r, PartnerByBankAccount.DefaultView, row.BranchCode, row.BankAccountNumber);
+                                FindDonorKey.Add(new MatchDonor(r, row.BranchCode, row.BankAccountNumber));
                             }
                         }
 
@@ -510,7 +529,14 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                         tempRow.GiftTransactionAmount = row.TransactionAmount;
                         tempRow.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
 
-                        FindDonorByAccountNumber(tempRow, PartnerByBankAccount.DefaultView, row.BranchCode, row.BankAccountNumber);
+                        String DonorShortName;
+                        Int64 DonorKey;
+
+                        if (FindDonorByAccountNumber(PartnerByBankAccount.DefaultView, row.BranchCode, row.BankAccountNumber, out DonorShortName, out DonorKey))
+                        {
+                            tempRow.DonorKey = DonorKey;
+                            tempRow.DonorShortName = DonorShortName;
+                        }
 
 #if disabled
                         // fuzzy search for the partner. only return if unique result
@@ -559,6 +585,18 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                     r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                     r.DonorKey = 0;
                     r.RecipientKey = 0;
+                }
+
+                foreach (MatchDonor d in FindDonorKey)
+                {
+                    String DonorShortName;
+                    Int64 DonorKey;
+
+                    if (FindDonorByAccountNumber(PartnerByBankAccount.DefaultView, d.b, d.a, out DonorShortName, out DonorKey))
+                    {
+                        d.r.DonorKey = DonorKey;
+                        d.r.DonorShortName = DonorShortName;
+                    }
                 }
 
                 TProgressTracker.SetCurrentState(MyClientID,
