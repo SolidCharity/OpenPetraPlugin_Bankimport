@@ -459,6 +459,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                 && (MergedPartners.DefaultView.FindRows(r.RecipientKey).Length > 0))
                             {
                                 TLogging.LogAtLevel(1, "partner has been merged: " + r.RecipientKey.ToString());
+                                r.RecipientKey = 0;
                                 action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
@@ -467,6 +468,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                 && (MergedPartners.DefaultView.FindRows(r.DonorKey).Length > 0))
                             {
                                 TLogging.LogAtLevel(1, "partner has been merged: " + r.DonorKey.ToString());
+                                r.DonorKey = 0;
                                 action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
@@ -487,7 +489,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                 NewDates.Add(new MatchDate(r, row.DateEffective));
                             }
 
-                            if (action == MFinanceConstants.BANK_STMT_STATUS_UNMATCHED)
+                            if (action == MFinanceConstants.BANK_STMT_STATUS_UNMATCHED && r.Action != action)
                             {
                                 SetUnmatched.Add(r);
                             }
@@ -583,8 +585,6 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 foreach (AEpMatchRow r in SetUnmatched)
                 {
                     r.Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
-                    r.DonorKey = 0;
-                    r.RecipientKey = 0;
                 }
 
                 foreach (MatchDonor d in FindDonorKey)
