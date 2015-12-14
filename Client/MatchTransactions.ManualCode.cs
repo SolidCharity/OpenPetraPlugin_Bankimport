@@ -506,7 +506,14 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
                 if (CurrentlySelectedMatch.IsNarrativeNull())
                 {
-                    txtGLNarrative.Text = CurrentlySelectedTransaction.Description;
+                    txtGLNarrative.Text = CurrentlySelectedTransaction.AccountName;
+
+                    if (txtGLNarrative.Text.Length > 0)
+                    {
+                        txtGLNarrative.Text += " ";
+                    }
+
+                    txtGLNarrative.Text += CurrentlySelectedTransaction.Description;
                 }
                 else
                 {

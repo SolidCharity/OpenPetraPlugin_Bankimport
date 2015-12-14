@@ -73,7 +73,7 @@ RootNode:
             Controls: [txtGLNarrative, txtGLReference, cmbGLAccount, cmbGLCostCentre]
         cmbGLAccount: {Label=Account, List=UserDefinedList}
         cmbGLCostCentre: {Label=Cost Centre, List=UserDefinedList}
-        txtGLNarrative: {Label=Narrative}
-        txtGLReference: {Label=Reference}
+        txtGLNarrative: {Label=Narrative, Width=250}
+        txtGLReference: {Label=Reference, Width=250}
     Menu:
     Toolbar:

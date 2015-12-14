@@ -1031,6 +1031,8 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
             gljournalRow.ExchangeRateToBase = 1.0m;
             GLDS.AJournal.Rows.Add(gljournalRow);
 
+            ATransactionRow trans;
+
             foreach (DataRowView dv in AMainDS.AEpTransaction.DefaultView)
             {
                 AEpTransactionRow transactionRow = (AEpTransactionRow)dv.Row;
@@ -1042,7 +1044,7 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 if (v.Count > 0)
                 {
                     AEpMatchRow match = (AEpMatchRow)v[0].Row;
-                    ATransactionRow trans = GLDS.ATransaction.NewRowTyped();
+                    trans = GLDS.ATransaction.NewRowTyped();
                     trans.LedgerNumber = glbatchRow.LedgerNumber;
                     trans.BatchNumber = glbatchRow.BatchNumber;
                     trans.JournalNumber = gljournalRow.JournalNumber;
@@ -1070,38 +1072,38 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
 
                     GLDS.ATransaction.Rows.Add(trans);
                     gljournalRow.LastTransactionNumber++;
-
-                    // add one transaction for the bank as well
-                    trans = GLDS.ATransaction.NewRowTyped();
-                    trans.LedgerNumber = glbatchRow.LedgerNumber;
-                    trans.BatchNumber = glbatchRow.BatchNumber;
-                    trans.JournalNumber = gljournalRow.JournalNumber;
-                    trans.TransactionNumber = gljournalRow.LastTransactionNumber + 1;
-                    trans.AccountCode = stmt.BankAccountCode;
-                    trans.CostCentreCode = TLedgerInfo.GetStandardCostCentre(ALedgerNumber);
-                    trans.Reference = match.Reference;
-                    trans.Narrative = match.Narrative;
-                    trans.TransactionDate = transactionRow.DateEffective;
-
-                    if (transactionRow.TransactionAmount < 0)
-                    {
-                        trans.AmountInBaseCurrency = -1 * transactionRow.TransactionAmount;
-                        trans.TransactionAmount = -1 * transactionRow.TransactionAmount;
-                        trans.DebitCreditIndicator = false;
-                        CreditTotal += trans.AmountInBaseCurrency;
-                    }
-                    else
-                    {
-                        trans.AmountInBaseCurrency = transactionRow.TransactionAmount;
-                        trans.TransactionAmount = transactionRow.TransactionAmount;
-                        trans.DebitCreditIndicator = true;
-                        DebitTotal += trans.AmountInBaseCurrency;
-                    }
-
-                    GLDS.ATransaction.Rows.Add(trans);
-                    gljournalRow.LastTransactionNumber++;
                 }
             }
+
+            // add one transaction for the bank account as well
+            trans = GLDS.ATransaction.NewRowTyped();
+            trans.LedgerNumber = glbatchRow.LedgerNumber;
+            trans.BatchNumber = glbatchRow.BatchNumber;
+            trans.JournalNumber = gljournalRow.JournalNumber;
+            trans.TransactionNumber = gljournalRow.LastTransactionNumber + 1;
+            trans.AccountCode = stmt.BankAccountCode;
+            trans.CostCentreCode = TLedgerInfo.GetStandardCostCentre(ALedgerNumber);
+            trans.Reference = String.Empty;
+            trans.Narrative = gljournalRow.JournalDescription;
+            trans.TransactionDate = glbatchRow.DateEffective;
+
+            if (CreditTotal > DebitTotal)
+            {
+                trans.AmountInBaseCurrency = CreditTotal - DebitTotal;
+                trans.TransactionAmount = CreditTotal - DebitTotal;
+                trans.DebitCreditIndicator = true;
+                DebitTotal += (CreditTotal - DebitTotal);
+            }
+            else
+            {
+                trans.AmountInBaseCurrency = DebitTotal - CreditTotal;
+                trans.TransactionAmount = DebitTotal - CreditTotal;
+                trans.DebitCreditIndicator = false;
+                CreditTotal += (DebitTotal - CreditTotal);
+            }
+
+            GLDS.ATransaction.Rows.Add(trans);
+            gljournalRow.LastTransactionNumber++;
 
             gljournalRow.JournalDebitTotal = DebitTotal;
             gljournalRow.JournalCreditTotal = CreditTotal;
