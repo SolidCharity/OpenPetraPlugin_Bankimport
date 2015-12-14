@@ -366,6 +366,9 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                         DataUtilities.CopyAllColumnValues(EditedRow, NewRow);
                         FMainDS.AEpMatch.Rows.Add(NewRow);
                     }
+
+                    grdAllTransactions.SelectRowInGrid(1);
+                    AllTransactionsFocusedRowChanged(null, null);
                 }
             }
         }
