@@ -10,8 +10,9 @@ RootNode:
     Controls:
         pnlDialogContent:
             Dock: Fill
-            Controls: [cmbSelectBankAccount, cmbSelectPlugin]
-        cmbSelectBankAccount: {List=UserDefinedList}
-        cmbSelectPlugin: {Width=200}
+            Controls: [cmbSelectBankAccount, cmbSelectPlugin, txtCSVColumns]
+        cmbSelectBankAccount: {List=UserDefinedList, OnChange=SelectAccount}
+        cmbSelectPlugin: {Width=200, OnChange=SelectPlugin}
+        txtCSVColumns: {Width=200, Visible=false}
     Menu:
     Toolbar:

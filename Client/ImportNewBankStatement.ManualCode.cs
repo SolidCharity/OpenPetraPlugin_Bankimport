@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2014 by OM International
+// Copyright 2004-2015 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -45,6 +45,8 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 {
     public partial class TFrmImportNewBankStatement
     {
+        private const string strCSVColumnsDefault = "unused,DateEffective,Description,Amount,Currency";
+
         /// <summary>
         /// constant for the namespace of the bankimport plugin
         /// </summary>
@@ -87,6 +89,31 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
                 cmbSelectPlugin.SetSelectedString(
                     TUserDefaults.GetStringDefault(TUserDefaults.FINANCE_BANKIMPORT_PLUGIN, ""), -1);
+
+                bool showCSVColumns = cmbSelectPlugin.GetSelectedString().Contains("CSV");
+                txtCSVColumns.Visible = showCSVColumns;
+
+                if (showCSVColumns)
+                {
+                    txtCSVColumns.Text = TUserDefaults.GetStringDefault("BANKIMPORTCSV" + cmbSelectBankAccount.GetSelectedString(), strCSVColumnsDefault);
+                }
+
+                lblCSVColumns.Visible = showCSVColumns;
+            }
+        }
+
+        private void SelectAccount(object sender, EventArgs e)
+        {
+            SelectPlugin(sender, e);
+        }
+
+        private void SelectPlugin(object sender, EventArgs e)
+        {
+            txtCSVColumns.Visible = cmbSelectPlugin.GetSelectedString().Contains("CSV");
+            lblCSVColumns.Visible = txtCSVColumns.Visible;
+            if (txtCSVColumns.Visible)
+            {
+                txtCSVColumns.Text = TUserDefaults.GetStringDefault("BANKIMPORTCSV" + cmbSelectBankAccount.GetSelectedString(), strCSVColumnsDefault);
             }
         }
 
@@ -106,6 +133,12 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
                 TUserDefaults.SetDefault(TUserDefaults.FINANCE_BANKIMPORT_BANKACCOUNT,
                     cmbSelectBankAccount.GetSelectedString());
+
+                if (cmbSelectPlugin.GetSelectedString().Contains("CSV"))
+                {
+                    TUserDefaults.SetDefault("BANKIMPORTCSV" + cmbSelectBankAccount.GetSelectedString(),
+                        txtCSVColumns.Text);
+                }
 
                 TUserDefaults.SaveChangedUserDefault(TUserDefaults.FINANCE_BANKIMPORT_PLUGIN);
 
