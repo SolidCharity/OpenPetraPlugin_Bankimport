@@ -59,6 +59,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
         private Int32 FLedgerNumber;
         private BankImportTDS FMainDS;
         private DataView FMatchView;
+        private bool FGLImportOnly = false;
 
         /// <summary>
         /// pass the data
@@ -73,6 +74,18 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             get
             {
                 return FMainDS;
+            }
+        }
+
+        /// <summary>
+        /// do not show gift import
+        /// </summary>
+        public bool GLImportOnly
+        {
+            set
+            {
+                FGLImportOnly = value;
+                rbtGift.Enabled = !FGLImportOnly;
             }
         }
 

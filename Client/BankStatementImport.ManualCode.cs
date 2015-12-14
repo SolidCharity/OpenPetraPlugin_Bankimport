@@ -58,6 +58,26 @@ namespace Ict.Petra.Plugins.Bankimport.Client
     {
         private Int32 FLedgerNumber;
         private TMBankimportNamespace FPluginRemote;
+        private bool FGLImportOnly = false;
+
+        /// <summary>
+        /// do not show gift import
+        /// </summary>
+        public bool GLImportOnly
+        {
+            set
+            {
+                FGLImportOnly = value;
+                tbbCreateGiftBatch.Visible = false;
+                tbbExportGiftBatch.Visible = false;
+                rbtListUnmatchedGift.Visible = false;
+                rbtListGift.Visible = false;
+                rbtListIgnored.Left = rbtListUnmatchedGL.Left;
+                rbtListUnmatchedGL.Left = rbtListUnmatchedGift.Left;
+                rbtListGL.Left = rbtListGift.Left;
+                rbtListUnmatchedGL.Checked = true;
+            }
+        }
 
         /// <summary>
         /// use this ledger
@@ -339,6 +359,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             {
                 TFrmMatchTransactions dlg = new TFrmMatchTransactions(this);
                 dlg.MainDS = (BankImportTDS)FMainDS.Copy();
+                dlg.GLImportOnly = FGLImportOnly;
                 dlg.LedgerNumber = FLedgerNumber;
                 dlg.MatchText = CurrentlySelectedTransaction.MatchText;
 
@@ -576,30 +597,33 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             PrintReportToPDF(baseFilename + "_" + all + ".pdf",
                 TAppSettingsManager.GetValue("BankImport.ReportHTMLTemplate"));
 
-            // export matched gifts, as PDF
-            rbtListGift.Checked = true;
-            PrintReportToPDF(baseFilename + "_" + matched_gifts + ".pdf",
-                TAppSettingsManager.GetValue("BankImport.ReportHTMLTemplate"));
-
-            // export matched gifts, as gift batch csv file
-            rbtListGift.Checked = true;
-            ExportGiftBatch(false);
-
-            if (File.Exists(baseFilename + "_giftbatch.csv"))
+            if (!FGLImportOnly)
             {
-                File.Delete(baseFilename + "_giftbatch.csv");
+                // export matched gifts, as PDF
+                rbtListGift.Checked = true;
+                PrintReportToPDF(baseFilename + "_" + matched_gifts + ".pdf",
+                    TAppSettingsManager.GetValue("BankImport.ReportHTMLTemplate"));
+
+                // export matched gifts, as gift batch csv file
+                rbtListGift.Checked = true;
+                ExportGiftBatch(false);
+
+                if (File.Exists(baseFilename + "_giftbatch.csv"))
+                {
+                    File.Delete(baseFilename + "_giftbatch.csv");
+                }
+
+                File.Copy(TAppSettingsManager.GetValue("BankImport.GiftBatchExportFilename"),
+                    baseFilename + "_giftbatch.csv");
+
+                // export unmatched gifts, as CSV and as full pdf and as short pdf
+                rbtListUnmatchedGift.Checked = true;
+                ExportToExcelFile(baseFilename + "_" + unmatched_gifts + ".xlsx");
+                PrintReportToPDF(baseFilename + "_" + unmatched_gifts + ".pdf",
+                    TAppSettingsManager.GetValue("BankImport.ReportHTMLTemplate"));
+                PrintReportToPDF(baseFilename + "_" + unmatched_gifts + "_" + shortformat + ".pdf",
+                    TAppSettingsManager.GetValue("BankImport.ReportHTMLTemplate.ShortFormat"));
             }
-
-            File.Copy(TAppSettingsManager.GetValue("BankImport.GiftBatchExportFilename"),
-                baseFilename + "_giftbatch.csv");
-
-            // export unmatched gifts, as CSV and as full pdf and as short pdf
-            rbtListUnmatchedGift.Checked = true;
-            ExportToExcelFile(baseFilename + "_" + unmatched_gifts + ".xlsx");
-            PrintReportToPDF(baseFilename + "_" + unmatched_gifts + ".pdf",
-                TAppSettingsManager.GetValue("BankImport.ReportHTMLTemplate"));
-            PrintReportToPDF(baseFilename + "_" + unmatched_gifts + "_" + shortformat + ".pdf",
-                TAppSettingsManager.GetValue("BankImport.ReportHTMLTemplate.ShortFormat"));
 
             // export unmatched GL, as CSV and as pdf
             rbtListUnmatchedGL.Checked = true;
@@ -1080,13 +1104,27 @@ namespace Ict.Petra.Plugins.Bankimport.Client
             }
             else if (rbtListUnmatchedGL.Checked)
             {
-                FTransactionView.RowFilter = String.Format("{0}={1} and {2}='{3}' and ({4} NOT LIKE '%{5}' OR {4} IS NULL)",
-                    AEpStatementTable.GetStatementKeyDBName(),
-                    CurrentStatement.StatementKey,
-                    BankImportTDSAEpTransactionTable.GetMatchActionDBName(),
-                    MFinanceConstants.BANK_STMT_STATUS_UNMATCHED,
-                    BankImportTDSAEpTransactionTable.GetTransactionTypeCodeDBName(),
-                    MFinanceConstants.BANK_STMT_POTENTIAL_GIFT);
+                if (FGLImportOnly)
+                {
+                    // also show potential gifts
+                    FTransactionView.RowFilter = String.Format("{0}={1} and {2}='{3}' and ({4} LIKE '%{5}' OR {4} IS NULL)",
+                        AEpStatementTable.GetStatementKeyDBName(),
+                        CurrentStatement.StatementKey,
+                        BankImportTDSAEpTransactionTable.GetMatchActionDBName(),
+                        MFinanceConstants.BANK_STMT_STATUS_UNMATCHED,
+                        BankImportTDSAEpTransactionTable.GetTransactionTypeCodeDBName(),
+                        MFinanceConstants.BANK_STMT_POTENTIAL_GIFT);
+                }
+                else
+                {
+                    FTransactionView.RowFilter = String.Format("{0}={1} and {2}='{3}' and ({4} NOT LIKE '%{5}' OR {4} IS NULL)",
+                        AEpStatementTable.GetStatementKeyDBName(),
+                        CurrentStatement.StatementKey,
+                        BankImportTDSAEpTransactionTable.GetMatchActionDBName(),
+                        MFinanceConstants.BANK_STMT_STATUS_UNMATCHED,
+                        BankImportTDSAEpTransactionTable.GetTransactionTypeCodeDBName(),
+                        MFinanceConstants.BANK_STMT_POTENTIAL_GIFT);
+                }
             }
             else if (rbtListIgnored.Checked)
             {

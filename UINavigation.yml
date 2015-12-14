@@ -2,6 +2,9 @@ OpenPetra:
     MainMenu:
         Finance:
             Finance:
+                GeneralLedger:
+                    GLBatchMaintenance:
+                        ImportBankStatement: {Description: "Import Bank Statements", Namespace=Ict.Petra.Plugins.Bankimport.Client, ActionOpenScreen=TFrmBankStatementImport, Label="Bank Import", PermissionsRequired=FINANCE-1, GLImportOnly=true}
                 GiftProcessing:
                     GiftEntry:
                         ImportGiftsFromBankStatement: {Description: "Import Bank Statements", Namespace=Ict.Petra.Plugins.Bankimport.Client, ActionOpenScreen=TFrmBankStatementImport, Label="Bank Import", PermissionsRequired=FINANCE-1}
