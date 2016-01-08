@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2015 by OM International
+// Copyright 2004-2016 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -402,6 +402,15 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 DataTable MergedPartners = DBAccess.GDBAccessObj.SelectDT(sqlGetMergedRecipients, "mergedPartners", Transaction);
                 MergedPartners.DefaultView.Sort = "PartnerKey";
 
+                // get all recipients that are not active anymore
+                string sqlGetNotActiveRecipients =
+                    string.Format(
+                        "SELECT DISTINCT p.p_partner_key_n AS PartnerKey, p.p_status_code_c AS StatusCode FROM PUB_a_ep_match m, PUB_p_partner p " +
+                        "WHERE m.p_recipient_key_n = p.p_partner_key_n AND p.p_status_code_c <> '{0}'",
+                        MPartnerConstants.PARTNERSTATUS_ACTIVE);
+                DataTable NotActiveRecipients = DBAccess.GDBAccessObj.SelectDT(sqlGetNotActiveRecipients, "notActiveRecipients", Transaction);
+                NotActiveRecipients.DefaultView.Sort = "PartnerKey";
+
                 DBAccess.GDBAccessObj.RollbackTransaction();
 
                 string BankAccountCode = ResultDataset.AEpStatement[0].BankAccountCode;
@@ -469,6 +478,14 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                             {
                                 TLogging.LogAtLevel(1, "partner has been merged: " + r.DonorKey.ToString());
                                 r.DonorKey = 0;
+                                action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+                            }
+
+                            // check if the recipient is still active
+                            if ((r.RecipientKey != 0)
+                                && (NotActiveRecipients.DefaultView.FindRows(r.RecipientKey).Length > 0))
+                            {
+                                r.RecipientKey = 0;
                                 action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
@@ -950,6 +967,11 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
             if (result == TSubmitChangesResult.scrOK)
             {
                 return giftbatchRow.BatchNumber;
+            }
+            else
+            {
+                TLogging.Log("Bankimport: Problem with creating gift batch:");
+                TLogging.Log(VerificationResultSubmitChanges.BuildVerificationResultString());
             }
 
             return -1;
