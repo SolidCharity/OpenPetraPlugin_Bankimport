@@ -44,7 +44,6 @@ using Ict.Petra.Shared.MFinance.Account.Data;
 using Ict.Petra.Shared.MFinance.Gift.Data;
 using Ict.Petra.Shared.MPartner.Partner.Data;
 using Ict.Petra.Shared.MPartner;
-using Ict.Petra.Shared.MPartner.Validation;
 using Ict.Petra.Shared.MFinance;
 using Ict.Petra.Server.MFinance.Cacheable;
 using Ict.Petra.Server.MFinance.Account.Data.Access;
@@ -490,15 +489,6 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                                 action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
                             }
 
-                            // check if the recipient has special type CC, but there is no linked costcentre
-                            int CCLedgerNumber = TAppSettingsManager.GetInt32("LedgerForPartnerCCLinks", ALedgerNumber);
-
-                            if ((r.RecipientKey != 0) && !TSharedPartnerValidationHelper.PartnerOfTypeCCIsLinked(CCLedgerNumber, r.RecipientKey))
-                            {
-                                TLogging.LogAtLevel(1, "Recipient " + r.RecipientKey.ToString() + " is not linked to any CC; donor: " + r.DonorKey.ToString());
-                                action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
-                            }
-
                             // check if the costcentre is still active
                             ACostCentreRow costcentre = (ACostCentreRow)ResultDataset.ACostCentre.Rows.Find(new object[] { ALedgerNumber,
                                                                                                                            r.CostCentreCode });
@@ -935,17 +925,6 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                             {
                                 detail.CostCentreCode = motivation.CostCentreCode;
                             }
-                        }
-
-                        // check for partner costcentre link
-                        int CCLedgerNumber = TAppSettingsManager.GetInt32("LedgerForPartnerCCLinks", detail.LedgerNumber);
-
-                        if ((detail.RecipientKey != 0) && !TSharedPartnerValidationHelper.PartnerOfTypeCCIsLinked(CCLedgerNumber, detail.RecipientKey))
-                        {
-                            AVerificationResult.Add(new TVerificationResult(
-                                    String.Format(Catalog.GetString("creating gift for match {0}"), transactionRow.Description),
-                                    Catalog.GetString("Missing linked cost centre for recipient partner"),
-                                    TResultSeverity.Resv_Critical));
                         }
 
                         // check for active cost centre
