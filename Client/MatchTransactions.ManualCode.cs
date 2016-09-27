@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2015 by OM International
+// Copyright 2004-2016 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -208,7 +208,7 @@ namespace Ict.Petra.Plugins.Bankimport.Client
 
         private void FilterMotivationDetail(object sender, EventArgs e)
         {
-            TFinanceControls.ChangeFilterMotivationDetailList(ref cmbMotivationDetail, cmbMotivationGroup.GetSelectedString());
+            TFinanceControls.ChangeFilterMotivationDetailList(ref cmbMotivationDetail, cmbMotivationGroup.GetSelectedString(), true);
         }
 
         private void SetRecipientCostCentreAndField()
