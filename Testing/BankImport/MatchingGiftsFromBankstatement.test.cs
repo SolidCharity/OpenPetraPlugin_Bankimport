@@ -110,7 +110,9 @@ namespace Ict.Petra.Plugins.Bankimport.Testing
 
             Assert.AreNotEqual(-1, BatchNumber, "Failed to import gift batch: " + VerificationResult.BuildVerificationResultString());
 
-            if (!TGiftTransactionWebConnector.PostGiftBatch(FLedgerNumber, BatchNumber, out VerificationResult))
+            Int32 generatedGlBatchNumber;
+
+            if (!TGiftTransactionWebConnector.PostGiftBatch(FLedgerNumber, BatchNumber, out generatedGlBatchNumber, out VerificationResult))
             {
                 Assert.Fail("Gift Batch was not posted: " + VerificationResult.BuildVerificationResultString());
             }
