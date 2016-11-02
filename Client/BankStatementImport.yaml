@@ -76,6 +76,7 @@ RootNode:
             CustomColumns:
                 NumberOnPaperStatement: {Label=Nr}
             ColumnWidth: {NumberOnPaperStatement=40, AccountName=100, DateEffective=100, TransactionAmount=100}
+            MaxAutoSizeRows: 1
             ActionFocusRow: AllTransactionsFocusedRowChanged
             ActionDoubleClick: EditMatchClicked
             ActionEnterKeyPressed: EditMatchClicked
