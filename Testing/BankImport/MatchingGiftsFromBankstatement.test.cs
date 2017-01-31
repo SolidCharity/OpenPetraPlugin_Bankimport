@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2015 by OM International
+// Copyright 2004-2017 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -103,8 +103,9 @@ namespace Ict.Petra.Plugins.Bankimport.Testing
 
             TVerificationResultCollection VerificationResult;
             GiftBatchTDSAGiftDetailTable NeedRecipientLedgerNumber;
+            bool refreshRequired;
 
-            importer.ImportGiftBatches(parameters, FileContent, out NeedRecipientLedgerNumber, out VerificationResult);
+            importer.ImportGiftBatches(parameters, FileContent, out NeedRecipientLedgerNumber, out refreshRequired, out VerificationResult);
 
             int BatchNumber = importer.GetLastGiftBatchNumber();
 
