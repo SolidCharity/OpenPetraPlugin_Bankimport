@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2016 by OM International
+// Copyright 2004-2017 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -299,12 +299,6 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 foreach (DataRowView rv in FMatchView)
                 {
                     ((AEpMatchRow)rv.Row).Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
-
-                    if (!CurrentlySelectedTransaction.IsEpMatchKeyNull()
-                        && (CurrentlySelectedTransaction.EpMatchKey != ((AEpMatchRow)rv.Row).EpMatchKey))
-                    {
-                        ((AEpMatchRow)rv.Row).Delete();
-                    }
                 }
             }
 
@@ -313,12 +307,6 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 foreach (DataRowView rv in FMatchView)
                 {
                     ((AEpMatchRow)rv.Row).Action = MFinanceConstants.BANK_STMT_STATUS_NO_MATCHING;
-
-                    if (!CurrentlySelectedTransaction.IsEpMatchKeyNull()
-                        && (CurrentlySelectedTransaction.EpMatchKey != ((AEpMatchRow)rv.Row).EpMatchKey))
-                    {
-                        ((AEpMatchRow)rv.Row).Delete();
-                    }
                 }
             }
         }
