@@ -299,6 +299,12 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 foreach (DataRowView rv in FMatchView)
                 {
                     ((AEpMatchRow)rv.Row).Action = MFinanceConstants.BANK_STMT_STATUS_UNMATCHED;
+
+                    if (!CurrentlySelectedTransaction.IsEpMatchKeyNull()
+                        && (CurrentlySelectedTransaction.EpMatchKey != ((AEpMatchRow)rv.Row).EpMatchKey))
+                    {
+                        ((AEpMatchRow)rv.Row).Delete();
+                    }
                 }
             }
 
@@ -307,6 +313,12 @@ namespace Ict.Petra.Plugins.Bankimport.Client
                 foreach (DataRowView rv in FMatchView)
                 {
                     ((AEpMatchRow)rv.Row).Action = MFinanceConstants.BANK_STMT_STATUS_NO_MATCHING;
+
+                    if (!CurrentlySelectedTransaction.IsEpMatchKeyNull()
+                        && (CurrentlySelectedTransaction.EpMatchKey != ((AEpMatchRow)rv.Row).EpMatchKey))
+                    {
+                        ((AEpMatchRow)rv.Row).Delete();
+                    }
                 }
             }
         }

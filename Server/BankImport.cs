@@ -4,7 +4,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2016 by OM International
+// Copyright 2004-2017 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -701,16 +701,45 @@ namespace Ict.Petra.Plugins.Bankimport.WebConnectors
                 return false;
             }
 
-            AMainDS.ThrowAwayAfterSubmitChanges = true;
+            bool NewTransaction;
+            TDBTransaction Transaction = DBAccess.GetDBAccessObj((TDataBase)null).GetNewOrExistingTransaction(IsolationLevel.Serializable, out NewTransaction);
 
             try
             {
-                BankImportTDSAccess.SubmitChanges(AMainDS);
+                for (int RowCount = 0; (RowCount != AMainDS.AEpMatch.Rows.Count); RowCount++)
+                {
+                    DataRow TheRow = AMainDS.AEpMatch.Rows[RowCount];
+    
+                    if (TheRow.RowState == DataRowState.Deleted)
+                    {
+                        string sql = "UPDATE " + AEpTransactionTable.GetTableDBName() +
+                            " SET " + AEpTransactionTable.GetEpMatchKeyDBName() + " = NULL" +
+                            " WHERE " + AEpTransactionTable.GetEpMatchKeyDBName() + " = " +
+                            TheRow[AEpMatchTable.GetEpMatchKeyDBName(), DataRowVersion.Original];
+                        DBAccess.GetDBAccessObj(Transaction).ExecuteNonQuery(sql, Transaction);
+                    }
+                }
+
+                AMainDS.ThrowAwayAfterSubmitChanges = true;
+
+                BankImportTDSAccess.SubmitChanges(AMainDS, Transaction.DataBaseObj);
+
+                if (NewTransaction)
+                {
+                    DBAccess.GetDBAccessObj(Transaction.DataBaseObj).CommitTransaction();
+                }
+
                 return true;
             }
             catch (Exception e)
             {
                 TLogging.Log("Bankimport, CommitMatches: " + e.ToString());
+
+                if (NewTransaction)
+                {
+                    DBAccess.GetDBAccessObj(Transaction.DataBaseObj).RollbackTransaction();
+                }
+
                 return false;
             }
         }
