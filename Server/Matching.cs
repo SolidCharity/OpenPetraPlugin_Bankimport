@@ -3,7 +3,7 @@
 // @Authors:
 //       timop
 //
-// Copyright 2004-2015 by OM International
+// Copyright 2004-2017 by OM International
 //
 // This file is part of OpenPetra.org.
 //
@@ -882,6 +882,7 @@ namespace Ict.Petra.Plugins.Bankimport.Server
                         Replace("-", "").
                         Replace(";", "").
                         Replace(".", "").
+                        Replace("'", "").
                         Replace(" ", "");
 
             if (matchtext.Contains("EREF+") && (matchtext.IndexOf("PURP+RINP") > matchtext.IndexOf("EREF+")))
